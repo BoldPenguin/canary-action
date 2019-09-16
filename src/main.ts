@@ -7,12 +7,12 @@ import { ChecksCreateParams } from '@octokit/rest';
 
 async function run() {
   try {
-    const githubToken = core.getInput('GITHUB_TOKEN');
+    const githubToken = core.getInput('github_token');
     const context = github.context;
     const repo = context.repo.repo;
     const prNum = context.payload.pull_request.number;
-    const bpToken = core.getInput('BP_GITHUB_TOKEN');
-    const bucket = core.getInput('BUCKET');
+    const bpToken = core.getInput('bp_github_token');
+    const bucket = core.getInput('bucket');
 
     const octokit = new github.GitHub(githubToken);
     const checkOptions: ChecksCreateParams = {
@@ -39,7 +39,7 @@ async function run() {
     core.setOutput('destination', destination);
 
     core.startGroup('Install dependencies')
-    exec.exec('npm', ['install']);
+    exec.exec('npm', ['ci']);
     core.endGroup();
 
     core.startGroup('Build')
