@@ -3,6 +3,8 @@ import * as exec from '@actions/exec';
 import * as github from '@actions/github';
 import { generateGithubNetRC } from './netrc';
 import { writeFileSync } from 'fs';
+import { homedir } from 'os';
+import { join } from 'path';
 import { ChecksCreateParams } from '@octokit/rest';
 
 async function run() {
@@ -32,7 +34,8 @@ async function run() {
 
     core.startGroup('Set netrc')
     const netrc = generateGithubNetRC(bpToken);
-    writeFileSync('~/.netrc', netrc);
+    const netrcPath = join(homedir(), '.netrc');
+    writeFileSync(netrcPath, netrc);
     core.endGroup();
 
     const destination = `s3://${bucket}/${repo}/${prNum}/`;
