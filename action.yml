@@ -1,0 +1,16 @@
+name: 'Angular Canary'
+description: 'Build'
+author: 'Jared Szechy'
+inputs:
+  GITHUB_EVENT_PATH:
+    description: GITHUB_EVENT_PATH
+  bpToken:
+    description: Auth token for github repos
+  bucket:
+    description: S3 bucket name
+outputs:
+  destination:
+    description: S3 URI for assets
+runs:
+  using: node10
+  main: lib/main.js
