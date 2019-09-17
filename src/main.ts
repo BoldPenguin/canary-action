@@ -42,11 +42,11 @@ async function run() {
     core.setOutput('destination', destination);
 
     core.startGroup('Install dependencies')
-    exec.exec('npm', ['ci']);
+    await exec.exec('npm', ['ci']);
     core.endGroup();
 
     core.startGroup('Build')
-    exec.exec('npm', ['run', 'build-canary']);
+    await exec.exec('npm', ['run', 'build-canary']);
     core.endGroup();
 
     core.startGroup('Complete GH Check');
@@ -59,8 +59,6 @@ async function run() {
     };
     octokit.checks.create(checkOptions);
     core.endGroup();
-
-
   } catch (error) {
     core.setFailed(error.message);
   }
