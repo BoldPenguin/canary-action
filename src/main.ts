@@ -5,7 +5,7 @@ import { generateGithubNetRC } from './netrc';
 import { writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
-import { ChecksCreateParams } from '@octokit/rest';
+import { ReposCreateDeploymentParams } from '@octokit/rest';
 
 async function run() {
   try {
@@ -17,19 +17,17 @@ async function run() {
     const bucket = core.getInput('bucket');
 
     const octokit = new github.GitHub(githubToken);
-    const checkOptions: ChecksCreateParams = {
-      ...context.repo,
-      name: 'Canary Build',
-      head_sha: context.payload.pull_request.head.sha,
-      status: 'in_progress',
-      output: {
-        title: 'Deploying',
-        summary: ''
-      }
-    };
 
-    core.startGroup('Create GH Check');
-    octokit.checks.create(checkOptions);
+    core.startGroup('Create Deployment');
+      const deployOpts: ReposCreateDeploymentParams  = {
+        ...context.repo,
+        ref: context.payload.pull_request.head.sha,
+        task: 'canary',
+        environment: 'alpha',
+        required_contexts: []
+      };
+    const resp = await octokit.repos.createDeployment(deployOpts);
+    console.log('resp', resp);
     core.endGroup();
 
     core.startGroup('Set netrc')
@@ -49,16 +47,16 @@ async function run() {
     await exec.exec('npm', ['run', 'build-canary']);
     core.endGroup();
 
-    core.startGroup('Complete GH Check');
-    checkOptions.status = 'completed';
-    checkOptions.conclusion = 'success';
-    checkOptions.completed_at = new Date().toISOString();
-    checkOptions.output = {
-      title: 'Deployed',
-      summary: `https://${repo}-${prNum}.canary.alpha.boldpenguin.com`
-    };
-    octokit.checks.create(checkOptions);
-    core.endGroup();
+    // core.startGroup('Complete Deployment');
+    // checkOptions.status = 'completed';
+    // checkOptions.conclusion = 'success';
+    // checkOptions.completed_at = new Date().toISOString();
+    // checkOptions.output = {
+    //   title: 'Deployed',
+    //   summary: `https://${repo}-${prNum}.canary.alpha.boldpenguin.com`
+    // };
+    // octokit.checks.create(checkOptions);
+    // core.endGroup();
   } catch (error) {
     core.setFailed(error.message);
   }
