@@ -24,7 +24,8 @@ async function run() {
         ref: context.payload.pull_request.head.sha,
         task: 'canary',
         environment: 'alpha',
-        required_contexts: []
+        required_contexts: [],
+        auto_merge: false
       };
     const resp = await octokit.repos.createDeployment(deployOpts);
     console.log('resp', resp);
