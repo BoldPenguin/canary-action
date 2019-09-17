@@ -52,7 +52,7 @@ async function run() {
     core.startGroup('Complete GH Check');
     checkOptions.status = 'completed';
     checkOptions.conclusion = 'success';
-    checkOptions.completed_at = new Date().toString();
+    checkOptions.completed_at = new Date().toISOString();
     checkOptions.output = {
       title: 'Deployed',
       summary: `https://${repo}-${prNum}.canary.alpha.boldpenguin.com`
