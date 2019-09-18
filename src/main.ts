@@ -11,6 +11,7 @@ async function run() {
   try {
     const githubToken = core.getInput('github_token');
     const context = github.context;
+    console.log('context', context);
     const repo = context.repo.repo;
     const prNum = context.payload.pull_request.number;
     const bpToken = core.getInput('bp_github_token');
