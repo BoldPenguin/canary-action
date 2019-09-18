@@ -16,6 +16,8 @@ async function run() {
     const bpToken = core.getInput('bp_github_token');
     const bucket = core.getInput('bucket');
 
+    process.chdir('/github/workspace');
+
     const octokit = new github.GitHub(githubToken);
 
     core.startGroup('Create Deployment');
@@ -46,6 +48,10 @@ async function run() {
 
     core.startGroup('Build')
     await exec.exec('npm', ['run', 'build-canary']);
+    core.endGroup();
+
+    core.startGroup('Upload to S3')
+    await exec.exec('aws', ['sync', './dist', destination, '--delete', '--region', 'us-east-1', '--acl', 'public-read', '--sse']);
     core.endGroup();
 
     core.startGroup('Complete Deployment');

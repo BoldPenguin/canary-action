@@ -1,0 +1,9 @@
+.dockerignore
+.gitignore
+.git/
+action.yml
+Dockerfile
+jest.config.js
+lib/
+node_modules/
+tests/

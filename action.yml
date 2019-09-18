@@ -11,9 +11,6 @@ inputs:
   bucket:
     description: S3 bucket name
     required: true
-outputs:
-  destination:
-    description: S3 URI for assets
 runs:
-  using: node12
-  main: lib/main.js
+  using: docker
+  image: Dockerfile
