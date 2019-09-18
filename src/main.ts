@@ -41,12 +41,12 @@ async function run() {
     core.endGroup();
 
     const destination = `s3://${bucket}/${repo}-${prNum}/`;
-    core.setOutput('destination', destination);
+    const url = `https://${repo}-${prNum}.canary.alpha.boldpenguin.com`
 
     await replaceInFile({
       files: 'src/environments/environment.canary.ts',
       from: 'replace-by-github-action',
-      to: `https://progressivegateway.alpha.boldpenguin.com/?redirectUrl=${destination}`
+      to: `https://progressivegateway.alpha.boldpenguin.com/?redirectUrl=${url}`
     });
 
     core.startGroup('Install dependencies')
@@ -66,7 +66,7 @@ async function run() {
       ...context.repo,
       deployment_id: deploymentId,
       state: 'success',
-      environment_url: `https://${repo}-${prNum}.canary.alpha.boldpenguin.com`
+      environment_url: url
     };
     await octokit.repos.createDeploymentStatus(statusOpts);
     core.endGroup();
