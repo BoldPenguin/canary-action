@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as github from '@actions/github';
+import replaceInFile from 'replace-in-file';
 import { generateGithubNetRC } from './netrc';
 import { writeFileSync } from 'fs';
 import { homedir } from 'os';
@@ -41,6 +42,12 @@ async function run() {
 
     const destination = `s3://${bucket}/${repo}-${prNum}/`;
     core.setOutput('destination', destination);
+
+    await replaceInFile({
+      files: 'src/environments/environment.canary.ts',
+      from: 'replace-by-github-action',
+      to: `https://progressivegateway.alpha.boldpenguin.com/?redirectUrl=${destination}`
+    });
 
     core.startGroup('Install dependencies')
     await exec.exec('npm', ['ci', '--unsafe-perm']);
