@@ -39,7 +39,7 @@ async function run() {
     writeFileSync(netrcPath, netrc);
     core.endGroup();
 
-    const destination = `s3://${bucket}/${repo}/${prNum}/`;
+    const destination = `s3://${bucket}/${repo}-${prNum}/`;
     core.setOutput('destination', destination);
 
     core.startGroup('Install dependencies')
