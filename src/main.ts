@@ -51,7 +51,7 @@ async function run() {
     core.endGroup();
 
     core.startGroup('Upload to S3')
-    await exec.exec('aws', ['sync', './dist', destination, '--delete', '--region', 'us-east-1', '--acl', 'public-read', '--sse']);
+    await exec.exec('aws', ['s3', 'sync', './dist', destination, '--delete', '--region', 'us-east-1', '--acl', 'public-read', '--sse']);
     core.endGroup();
 
     core.startGroup('Complete Deployment');
