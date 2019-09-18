@@ -43,7 +43,7 @@ async function run() {
     core.setOutput('destination', destination);
 
     core.startGroup('Install dependencies')
-    await exec.exec('npm', ['ci']);
+    await exec.exec('npm', ['ci', '--unsafe-perm']);
     core.endGroup();
 
     core.startGroup('Build')
