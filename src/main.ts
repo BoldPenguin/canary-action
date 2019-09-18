@@ -16,6 +16,8 @@ async function run() {
     const prNum = context.issue.number;
     const bpToken = core.getInput('bp_github_token');
     const bucket = core.getInput('bucket');
+    const destination = `s3://${bucket}/${repo}-${prNum}/`;
+    const url = `https://${repo}-${prNum}.canary.alpha.boldpenguin.com`;
 
     process.chdir('/github/workspace');
 
@@ -40,14 +42,13 @@ async function run() {
     writeFileSync(netrcPath, netrc);
     core.endGroup();
 
-    const destination = `s3://${bucket}/${repo}-${prNum}/`;
-    const url = `https://${repo}-${prNum}.canary.alpha.boldpenguin.com`
-
+    core.startGroup('Rewrite redirect URL');
     await replaceInFile({
       files: 'src/environments/environment.canary.ts',
-      from: 'replace-by-github-action',
-      to: `https://progressivegateway.alpha.boldpenguin.com/?redirectUrl=${url}`
+      from: 'REDIRECT_URL',
+      to: url
     });
+    core.endGroup();
 
     core.startGroup('Install dependencies')
     await exec.exec('npm', ['ci', '--unsafe-perm']);
