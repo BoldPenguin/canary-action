@@ -20,6 +20,7 @@ async function run() {
     const dist_dir = core.getInput('dist_dir', { required: true });
     const projectName = core.getInput('project_name') || repo;
     const buildCmd = core.getInput('build_cmd', { required: true });
+    const skipEnvUpdate = core.getInput('skip_env_update');
     const destination = `s3://${bucket}/${projectName}-${prNum}/`;
 
     const url = `https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
@@ -47,13 +48,15 @@ async function run() {
     writeFileSync(netrcPath, netrc);
     core.endGroup();
 
-    core.startGroup('Rewrite redirect URL');
-    await replaceInFile({
-      files: 'src/environments/environment.canary.ts',
-      from: 'REDIRECT_URL',
-      to: url
-    });
-    core.endGroup();
+    if (!skipEnvUpdate) {
+      core.startGroup('Rewrite redirect URL');
+      await replaceInFile({
+        files: 'src/environments/environment.canary.ts',
+        from: 'REDIRECT_URL',
+        to: url
+      });
+      core.endGroup();
+    }
 
     core.startGroup('Install dependencies')
     await exec.exec('npm', ['ci', '--unsafe-perm']);

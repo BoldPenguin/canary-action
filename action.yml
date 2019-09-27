@@ -22,6 +22,9 @@ inputs:
     description: project name, defaults to repo name
     required: false
     default: 'build-canary'
+  skip_env_update:
+    description: skip updating the environment config file
+    required: false
 runs:
   using: docker
   image: Dockerfile
