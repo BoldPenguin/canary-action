@@ -11,6 +11,13 @@ inputs:
   bucket:
     description: S3 bucket name
     required: true
+  dist_dir:
+    description: output directory to sync to S3
+    required: true
+    default: './dist'
+  project_name:
+    description: project name, defaults to repo name
+    required: false
 runs:
   using: docker
   image: Dockerfile

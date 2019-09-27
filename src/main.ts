@@ -1,12 +1,13 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as github from '@actions/github';
-import replaceInFile from 'replace-in-file';
-import { generateGithubNetRC } from './netrc';
+import { ReposCreateDeploymentParams, ReposCreateDeploymentStatusParams } from '@octokit/rest';
 import { writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
-import { ReposCreateDeploymentParams, ReposCreateDeploymentStatusParams } from '@octokit/rest';
+import replaceInFile from 'replace-in-file';
+
+import { generateGithubNetRC } from './netrc';
 
 async function run() {
   try {
@@ -14,10 +15,13 @@ async function run() {
     const context = github.context;
     const repo = context.repo.repo;
     const prNum = context.issue.number;
-    const bpToken = core.getInput('bp_github_token');
-    const bucket = core.getInput('bucket');
-    const destination = `s3://${bucket}/${repo}-${prNum}/`;
-    const url = `https://${repo}-${prNum}.canary.alpha.boldpenguin.com`;
+    const bpToken = core.getInput('bp_github_token', { required: true });
+    const bucket = core.getInput('bucket', { required: true });
+    const dist_dir = core.getInput('dist_dir', { required: true });
+    const projectName = core.getInput('project_name') || repo;
+    const destination = `s3://${bucket}/${projectName}-${prNum}/`;
+
+    const url = `https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
 
     process.chdir('/github/workspace');
 
@@ -59,7 +63,7 @@ async function run() {
     core.endGroup();
 
     core.startGroup('Upload to S3')
-    await exec.exec('aws', ['s3', 'sync', './dist', destination, '--delete', '--region', 'us-east-1', '--acl', 'public-read', '--sse']);
+    await exec.exec('aws', ['s3', 'sync', dist_dir, destination, '--delete', '--region', 'us-east-1', '--acl', 'public-read', '--sse']);
     core.endGroup();
 
     core.startGroup('Complete Deployment');
