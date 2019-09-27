@@ -13,11 +13,15 @@ inputs:
     required: true
   dist_dir:
     description: output directory to sync to S3
-    required: true
+    required: false
     default: './dist'
   project_name:
     description: project name, defaults to repo name
     required: false
+  build_cmd:
+    description: project name, defaults to repo name
+    required: false
+    default: 'build-canary'
 runs:
   using: docker
   image: Dockerfile

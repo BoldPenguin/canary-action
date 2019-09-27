@@ -19,6 +19,7 @@ async function run() {
     const bucket = core.getInput('bucket', { required: true });
     const dist_dir = core.getInput('dist_dir', { required: true });
     const projectName = core.getInput('project_name') || repo;
+    const buildCmd = core.getInput('build_cmd', { required: true });
     const destination = `s3://${bucket}/${projectName}-${prNum}/`;
 
     const url = `https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
@@ -59,7 +60,7 @@ async function run() {
     core.endGroup();
 
     core.startGroup('Build')
-    await exec.exec('npm', ['run', 'build-canary']);
+    await exec.exec('npm', ['run', buildCmd]);
     core.endGroup();
 
     core.startGroup('Upload to S3')
