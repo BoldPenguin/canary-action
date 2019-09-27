@@ -20,6 +20,7 @@ async function run() {
     const dist_dir = core.getInput('dist_dir', { required: true });
     const projectName = core.getInput('project_name') || repo;
     const buildCmd = core.getInput('build_cmd', { required: true });
+    const deployEnv = core.getInput('deploy_env', { required: true });
     const skipEnvUpdate = core.getInput('skip_env_update');
     const destination = `s3://${bucket}/${projectName}-${prNum}/`;
 
@@ -34,7 +35,8 @@ async function run() {
         ...context.repo,
         ref: context.payload.pull_request.head.sha,
         task: 'canary',
-        environment: 'alpha',
+        environment: deployEnv,
+        transient_environment: true,
         required_contexts: [],
         auto_merge: false
       };

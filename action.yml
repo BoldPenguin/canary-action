@@ -25,6 +25,10 @@ inputs:
   skip_env_update:
     description: skip updating the environment config file
     required: false
+  deploy_env:
+    description: deployment environment name
+    required: false
+    default: alpha
 runs:
   using: docker
   image: Dockerfile
