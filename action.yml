@@ -28,7 +28,7 @@ inputs:
   deploy_env:
     description: deployment environment name
     required: false
-    default: alpha
+    default: canary
 runs:
   using: docker
   image: Dockerfile
