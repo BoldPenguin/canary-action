@@ -28,7 +28,7 @@ async function run() {
         ...context.repo,
         ref: context.payload.pull_request.head.sha,
         task: 'canary',
-        environment: 'alpha',
+        environment: 'canary',
         required_contexts: [],
         auto_merge: false
       };
