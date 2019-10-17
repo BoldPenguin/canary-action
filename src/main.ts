@@ -22,9 +22,10 @@ async function run() {
     const buildCmd = core.getInput('build_cmd', { required: true });
     const deployEnv = core.getInput('deploy_env', { required: true });
     const skipEnvUpdate = core.getInput('skip_env_update');
+    const base_url = core.getInput('base_url');
     const destination = `s3://${bucket}/${projectName}-${prNum}/`;
 
-    const url = `https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
+    const url = `${base_url}https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
 
     process.chdir('/github/workspace');
 
