@@ -21,8 +21,8 @@ async function run() {
     const projectName = core.getInput('project_name') || repo;
     const buildCmd = core.getInput('build_cmd', { required: true });
     const deployEnv = core.getInput('deploy_env', { required: true });
+    const base_url = core.getInput('base_url', required: true);
     const skipEnvUpdate = core.getInput('skip_env_update');
-    const base_url = core.getInput('base_url');
     const destination = `s3://${bucket}/${projectName}-${prNum}/`;
 
     const url = `${base_url}https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
