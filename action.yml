@@ -31,7 +31,7 @@ inputs:
     default: canary
   base_url:
     description: interpolated before the main url. for apps that start from gateways
-    required: true
+    required: false
     default: ''
 runs:
   using: docker
