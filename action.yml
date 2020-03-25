@@ -11,6 +11,9 @@ inputs:
   bucket:
     description: S3 bucket name
     required: true
+  working_dir:
+    description: Working directory
+    required: false
   dist_dir:
     description: output directory to sync to S3
     required: false

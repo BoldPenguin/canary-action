@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as github from '@actions/github';
 import { ReposCreateDeploymentParams, ReposCreateDeploymentStatusParams } from '@octokit/rest';
-import { writeFileSync } from 'fs';
+import { writeFileSync, existsSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import replaceInFile from 'replace-in-file';
@@ -22,6 +22,7 @@ async function run() {
     const buildCmd = core.getInput('build_cmd', { required: true });
     const deployEnv = core.getInput('deploy_env', { required: true });
     const skipEnvUpdate = core.getInput('skip_env_update');
+    const workingDir = core.getInput('working_dir');
     const destination = `s3://${bucket}/${projectName}-${prNum}/`;
 
     const url = `https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
@@ -50,6 +51,11 @@ async function run() {
     writeFileSync(netrcPath, netrc);
     core.endGroup();
 
+    if (workingDir) {
+      process.chdir(workingDir);
+    }
+    console.log('Current working directory: ' + process.cwd());
+
     if (!skipEnvUpdate) {
       core.startGroup('Rewrite redirect URL');
       await replaceInFile({
@@ -61,7 +67,11 @@ async function run() {
     }
 
     core.startGroup('Install dependencies')
-    await exec.exec('npm', ['ci', '--unsafe-perm']);
+    if (existsSync('./yarn.lock')) {
+      await exec.exec('yarn');
+    } else {
+      await exec.exec('npm', ['ci', '--unsafe-perm']);
+    }
     core.endGroup();
 
     core.startGroup('Build')
