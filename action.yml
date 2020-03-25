@@ -32,6 +32,10 @@ inputs:
     description: deployment environment name
     required: false
     default: canary
+  base_url:
+    description: interpolated before the main url. for apps that start from gateways
+    required: false
+    default: ''
 runs:
   using: docker
   image: Dockerfile
