@@ -7,7 +7,7 @@ import { homedir } from 'os';
 import { join } from 'path';
 import replaceInFile from 'replace-in-file';
 
-import { generateGithubNetRC } from './netrc';
+import { generateGithubNetRC, generateNpmRC } from './netrc';
 
 async function run() {
   try {
@@ -50,6 +50,12 @@ async function run() {
     const netrc = generateGithubNetRC(bpToken);
     const netrcPath = join(homedir(), '.netrc');
     writeFileSync(netrcPath, netrc);
+    core.endGroup();
+
+    core.startGroup('Set npmrc');
+    const npmrc = generateNpmRC(bpToken);
+    const npmrcPath = join(homedir(), '.npmrc');
+    writeFileSync(npmrcPath, npmrc);
     core.endGroup();
 
     if (workingDir) {
