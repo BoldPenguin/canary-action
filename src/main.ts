@@ -14,8 +14,7 @@ async function run() {
     const githubToken = core.getInput('github_token');
     const context = github.context;
     const repo = context.repo.repo;
-    const ref = (context.ref || '').replace('/', '-').replace('\\', '-');
-    const pr_ref = 
+    const ref = (context.ref || '').replace(/\//g, '-').replace(/\\/gi,'-');
     console.log(`ref: ${ref}`);
     const prNum = context.issue.number;
     console.log(`prNum: ${prNum}`);
