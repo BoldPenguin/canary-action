@@ -14,10 +14,14 @@ async function run() {
     const githubToken = core.getInput('github_token');
     const context = github.context;
     const repo = context.repo.repo;
-    const ref = (context.ref || '')
-                .replace(/\//g, '-')
-                .replace(/\\/g,'-')
-                .toLowerCase();
+    let ref = context.ref || '';
+    if (ref.startsWith('refs/heads/')) {
+      ref = ref.slice('refs/heads/'.length);
+    }
+    ref = ref
+          .replace(/\//g, '-')
+          .replace(/\\/g,'-')
+          .toLowerCase();
     const prNum = context.issue.number;
     const bpToken = core.getInput('bp_github_token', { required: true });
     const bucket = core.getInput('bucket', { required: true });
@@ -30,13 +34,9 @@ async function run() {
     const workingDir = core.getInput('working_dir');
     const useRefForDestination = core.getInput('use_ref');
 
-    const destination = useRefForDestination ? 
-                          `s3://${bucket}/${projectName}-${ref}/` :
-                          `s3://${bucket}/${projectName}-${prNum}/`;
-
-    const url = useRefForDestination ? 
-                  `${base_url}https://${projectName}-${ref}.canary.alpha.boldpenguin.com` :
-                  `${base_url}https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
+    const bucketRef = useRefForDestination ? ref : prNum;
+    const destination = `s3://${bucket}/${projectName}-${bucketRef}/`;
+    const url = `${base_url}https://${projectName}-${bucketRef}.canary.alpha.boldpenguin.com`;
 
     process.chdir('/github/workspace');
 
