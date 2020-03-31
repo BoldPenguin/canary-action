@@ -14,6 +14,7 @@ async function run() {
     const githubToken = core.getInput('github_token');
     const context = github.context;
     const repo = context.repo.repo;
+    const ref = context.ref;
     const prNum = context.issue.number;
     const bpToken = core.getInput('bp_github_token', { required: true });
     const bucket = core.getInput('bucket', { required: true });
@@ -24,9 +25,15 @@ async function run() {
     const base_url = core.getInput('base_url');
     const skipEnvUpdate = core.getInput('skip_env_update');
     const workingDir = core.getInput('working_dir');
-    const destination = `s3://${bucket}/${projectName}-${prNum}/`;
+    const useRefForDestination = core.getInput('use_ref');
 
-    const url = `${base_url}https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
+    const destination = useRefForDestination ? 
+                          `s3://${bucket}/${projectName}-${ref}/` :
+                          `s3://${bucket}/${projectName}-${prNum}/`;
+
+    const url = useRefForDestination ? 
+                  `${base_url}https://${projectName}-${ref}.canary.alpha.boldpenguin.com` :
+                  `${base_url}https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
 
     process.chdir('/github/workspace');
 
