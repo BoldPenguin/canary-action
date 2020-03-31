@@ -39,7 +39,7 @@ inputs:
   use_ref:
     description: Use the ref rather than the PR number. This is intended when canary builds are done on every merge to a branch
     required: false
-    default: false
+    default: ''
 runs:
   using: docker
   image: Dockerfile
