@@ -14,6 +14,14 @@ async function run() {
     const githubToken = core.getInput('github_token');
     const context = github.context;
     const repo = context.repo.repo;
+    let ref = context.ref || '';
+    if (ref.startsWith('refs/heads/')) {
+      ref = ref.slice('refs/heads/'.length);
+    }
+    ref = ref
+          .replace(/\//g, '-')
+          .replace(/\\/g,'-')
+          .toLowerCase();
     const prNum = context.issue.number;
     const bpToken = core.getInput('bp_github_token', { required: true });
     const bucket = core.getInput('bucket', { required: true });
@@ -24,9 +32,11 @@ async function run() {
     const base_url = core.getInput('base_url');
     const skipEnvUpdate = core.getInput('skip_env_update');
     const workingDir = core.getInput('working_dir');
-    const destination = `s3://${bucket}/${projectName}-${prNum}/`;
+    const useRefForDestination = core.getInput('use_ref');
 
-    const url = `${base_url}https://${projectName}-${prNum}.canary.alpha.boldpenguin.com`;
+    const bucketRef = useRefForDestination ? ref : prNum;
+    const destination = `s3://${bucket}/${projectName}-${bucketRef}/`;
+    const url = `${base_url}https://${projectName}-${bucketRef}.canary.alpha.boldpenguin.com`;
 
     process.chdir('/github/workspace');
 
@@ -35,7 +45,7 @@ async function run() {
     core.startGroup('Create Deployment');
       const deployOpts: ReposCreateDeploymentParams  = {
         ...context.repo,
-        ref: context.payload.pull_request.head.sha,
+        ref: context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha,
         task: 'canary',
         environment: deployEnv,
         transient_environment: true,

@@ -36,6 +36,10 @@ inputs:
     description: interpolated before the main url. for apps that start from gateways
     required: false
     default: ''
+  use_ref:
+    description: Use the ref rather than the PR number. This is intended when canary builds are done on every merge to a branch
+    required: false
+    default: false
 runs:
   using: docker
   image: Dockerfile
