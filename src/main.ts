@@ -14,7 +14,7 @@ async function run() {
     const githubToken = core.getInput('github_token');
     const context = github.context;
     const repo = context.repo.repo;
-    const ref = context.ref;
+    const ref = context.ref.replace('/', '-').replace('\\', '-');
     const prNum = context.issue.number;
     const bpToken = core.getInput('bp_github_token', { required: true });
     const bucket = core.getInput('bucket', { required: true });
