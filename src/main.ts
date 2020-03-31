@@ -18,9 +18,7 @@ async function run() {
                 .replace(/\//g, '-')
                 .replace(/\\/g,'-')
                 .toLowerCase();
-    console.log(`ref: ${ref}`);
     const prNum = context.issue.number;
-    console.log(`prNum: ${prNum}`);
     const bpToken = core.getInput('bp_github_token', { required: true });
     const bucket = core.getInput('bucket', { required: true });
     const dist_dir = core.getInput('dist_dir', { required: true });
