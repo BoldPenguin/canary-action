@@ -14,8 +14,11 @@ async function run() {
     const githubToken = core.getInput('github_token');
     const context = github.context;
     const repo = context.repo.repo;
-    const ref = context.ref.replace('/', '-').replace('\\', '-');
+    const ref = (context.ref || '').replace('/', '-').replace('\\', '-');
+    const pr_ref = 
+    console.log(`ref: ${ref}`);
     const prNum = context.issue.number;
+    console.log(`prNum: ${prNum}`);
     const bpToken = core.getInput('bp_github_token', { required: true });
     const bucket = core.getInput('bucket', { required: true });
     const dist_dir = core.getInput('dist_dir', { required: true });
@@ -42,7 +45,7 @@ async function run() {
     core.startGroup('Create Deployment');
       const deployOpts: ReposCreateDeploymentParams  = {
         ...context.repo,
-        ref: context.payload.pull_request.head.sha,
+        ref: context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha,
         task: 'canary',
         environment: deployEnv,
         transient_environment: true,
