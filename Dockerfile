@@ -1,6 +1,6 @@
 FROM python:alpine
 
-RUN apk add --no-cache jq npm git yarn
+RUN apk add --no-cache jq npm git yarn alpine-sdk
 
 RUN pip install awscli
 
