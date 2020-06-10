@@ -33,6 +33,7 @@ async function run() {
     const skipEnvUpdate = core.getInput('skip_env_update');
     const workingDir = core.getInput('working_dir');
     const useRefForDestination = core.getInput('use_ref');
+    const skipInstall = core.getInput('skip_install');
 
     const bucketRef = useRefForDestination ? ref : prNum;
     const destination = `s3://${bucket}/${projectName}-${bucketRef}/`;
@@ -83,13 +84,15 @@ async function run() {
       core.endGroup();
     }
 
-    core.startGroup('Install dependencies')
-    if (existsSync('./yarn.lock')) {
-      await exec.exec('yarn');
-    } else {
-      await exec.exec('npm', ['ci', '--unsafe-perm']);
+    if (!skipInstall) {
+      core.startGroup('Install dependencies')
+      if (existsSync('./yarn.lock')) {
+        await exec.exec('yarn');
+      } else {
+        await exec.exec('npm', ['ci', '--unsafe-perm']);
+      }
+      core.endGroup();
     }
-    core.endGroup();
 
     core.startGroup('Build')
     await exec.exec('npm', ['run', buildCmd]);
