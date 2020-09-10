@@ -11,6 +11,39 @@ inputs:
   bucket:
     description: S3 bucket name
     required: true
+  working_dir:
+    description: Working directory
+    required: false
+  dist_dir:
+    description: output directory to sync to S3
+    required: false
+    default: './dist'
+  project_name:
+    description: project name, defaults to repo name
+    required: false
+  build_cmd:
+    description: project name, defaults to repo name
+    required: false
+    default: 'build-canary'
+  skip_env_update:
+    description: skip updating the environment config file
+    required: false
+  deploy_env:
+    description: deployment environment name
+    required: false
+    default: canary
+  base_url:
+    description: interpolated before the main url. for apps that start from gateways
+    required: false
+    default: ''
+  use_ref:
+    description: Use the ref rather than the PR number. This is intended when canary builds are done on every merge to a branch
+    required: false
+    default: ''
+  skip_install:
+    description: Don't attempt to install dependecies with `npm ci`. Use this if you are sure the dependencies are already available via cache
+    required: false
+    default: ''
 runs:
   using: docker
   image: Dockerfile
