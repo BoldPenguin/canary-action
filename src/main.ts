@@ -81,24 +81,29 @@ async function run() {
       core.endGroup();
     }
 
-    if (!skipInstall) {
-      core.startGroup('Install dependencies');
-      if (existsSync('./yarn.lock')) {
+    if (existsSync('./yarn.lock')) {
+      // Yarn
+      if (!skipInstall) {
+        core.startGroup('Install dependencies');
         await exec.exec('yarn');
-      } else {
-        await exec.exec('npm', ['ci', '--unsafe-perm']);
+        core.endGroup();
       }
+
+      core.startGroup('Build');
+      await exec.exec('yarn', ['run', buildCmd]);
+      core.endGroup();
+    } else {
+      // NPM
+      if (!skipInstall) {
+        core.startGroup('Install dependencies');
+        await exec.exec('npm', ['ci', '--unsafe-perm']);
+        core.endGroup();
+      }
+
+      core.startGroup('Build');
+      await exec.exec('npm', ['run', buildCmd]);
       core.endGroup();
     }
-
-    core.startGroup('Build');
-    if (existsSync('./yarn.lock')) {
-      await exec.exec('yarn');
-    } else {
-      await exec.exec('npm', ['run', buildCmd]);
-    }
-
-    core.endGroup();
 
     core.startGroup('Upload to S3');
     await exec.exec('aws', ['s3', 'sync', dist_dir, destination, '--delete', '--region', 'us-east-1', '--acl', 'public-read', '--sse']);
