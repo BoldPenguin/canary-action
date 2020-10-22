@@ -18,10 +18,7 @@ async function run() {
     if (ref.startsWith('refs/heads/')) {
       ref = ref.slice('refs/heads/'.length);
     }
-    ref = ref
-          .replace(/\//g, '-')
-          .replace(/\\/g,'-')
-          .toLowerCase();
+    ref = ref.replace(/\//g, '-').replace(/\\/g, '-').toLowerCase();
     const prNum = context.issue.number;
     const bpToken = core.getInput('bp_github_token', { required: true });
     const bucket = core.getInput('bucket', { required: true });
@@ -44,20 +41,20 @@ async function run() {
     const octokit = new github.GitHub(githubToken);
 
     core.startGroup('Create Deployment');
-      const deployOpts: ReposCreateDeploymentParams  = {
-        ...context.repo,
-        ref: context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha,
-        task: 'canary',
-        environment: deployEnv,
-        transient_environment: true,
-        required_contexts: [],
-        auto_merge: false
-      };
+    const deployOpts: ReposCreateDeploymentParams = {
+      ...context.repo,
+      ref: context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha,
+      task: 'canary',
+      environment: deployEnv,
+      transient_environment: true,
+      required_contexts: [],
+      auto_merge: false,
+    };
     const resp = await octokit.repos.createDeployment(deployOpts);
     const deploymentId = resp.data.id;
     core.endGroup();
 
-    core.startGroup('Set netrc')
+    core.startGroup('Set netrc');
     const netrc = generateGithubNetRC(bpToken);
     const netrcPath = join(homedir(), '.netrc');
     writeFileSync(netrcPath, netrc);
@@ -79,26 +76,36 @@ async function run() {
       await replaceInFile({
         files: 'src/environments/environment.canary.ts',
         from: 'REDIRECT_URL',
-        to: url
+        to: url,
       });
       core.endGroup();
     }
 
-    if (!skipInstall) {
-      core.startGroup('Install dependencies')
-      if (existsSync('./yarn.lock')) {
+    if (existsSync('./yarn.lock')) {
+      // Yarn
+      if (!skipInstall) {
+        core.startGroup('Install dependencies');
         await exec.exec('yarn');
-      } else {
-        await exec.exec('npm', ['ci', '--unsafe-perm']);
+        core.endGroup();
       }
+
+      core.startGroup('Build');
+      await exec.exec('yarn', ['run', buildCmd]);
+      core.endGroup();
+    } else {
+      // NPM
+      if (!skipInstall) {
+        core.startGroup('Install dependencies');
+        await exec.exec('npm', ['ci', '--unsafe-perm']);
+        core.endGroup();
+      }
+
+      core.startGroup('Build');
+      await exec.exec('npm', ['run', buildCmd]);
       core.endGroup();
     }
 
-    core.startGroup('Build')
-    await exec.exec('npm', ['run', buildCmd]);
-    core.endGroup();
-
-    core.startGroup('Upload to S3')
+    core.startGroup('Upload to S3');
     await exec.exec('aws', ['s3', 'sync', dist_dir, destination, '--delete', '--region', 'us-east-1', '--acl', 'public-read', '--sse']);
     core.endGroup();
 
@@ -107,7 +114,7 @@ async function run() {
       ...context.repo,
       deployment_id: deploymentId,
       state: 'success',
-      environment_url: url
+      environment_url: url,
     };
     await octokit.repos.createDeploymentStatus(statusOpts);
     core.endGroup();
