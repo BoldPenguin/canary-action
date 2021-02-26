@@ -1,6 +1,6 @@
 FROM python:alpine
 
-RUN apk add --no-cache jq npm git yarn g++ make nasm autoconf automake
+RUN apk add --no-cache coreutils jq npm git yarn g++ make nasm autoconf automake
 
 RUN pip install awscli
 
